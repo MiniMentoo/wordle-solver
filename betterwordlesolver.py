@@ -3,7 +3,7 @@ WORDLE_SIZE = 5
 FILENAME = "words.txt"
 #FILENAME = "answers.txt"
 
-from string import ascii_lowercase as alc
+from string import ascii_lowercase
 
 with open(FILENAME, "r") as words:
     lines = words.readlines()
@@ -16,7 +16,7 @@ def charInWord(char, word):
             return True
     return False
 
-def eliminateLetter(char, words):
+def eliminateLetter(char, words): #if there's a double letter and one is grey, it'll eliminate all single letters too
     for x in range(len(words)-1, -1, -1):
         if charInWord(char, words[x]):
             words.pop(x)
@@ -28,7 +28,7 @@ def eliminateYellow(char, pos, words):
     for x in range(len(words)-1, -1, -1):
         if (not charInWord(char, words[x])):
             words.pop(x)
-        elif (words[x][i] == char):
+        elif (words[x][pos] == char):
             words.pop(x)
     return words
 
@@ -39,8 +39,38 @@ def findMatch(char, i, words):
             words.pop(x)
     return words
 
+def rankList(words):
+    rankList = [] #stores 5 dictionaries, each keeping track of how many times the letter appeared in that position
+    for i in range (WORDLE_SIZE):
+        dict = {}
+        for c in ascii_lowercase:
+            dict.update({c : 0})
+        rankList.append(dict)
+    
+    for x in range(len(words)-1, -1, -1):
+        for i in  range(WORDLE_SIZE):
+            c = words[x][i]
+            rankList[i][c] = rankList[i][c] + 1    
+    return rankList
+
+def computeValue(word, rankList):
+    value = 0
+    for i in range(WORDLE_SIZE):
+        value += rankList[i][word[i]]
+    return value
+
+def findBestGuess(words, rankList):
+    bestVal = -1
+    bestWord = None
+    for word in words:
+        val = computeValue(word, rankList)
+        if val > bestVal:
+            bestVal = val
+            bestWord = word
+    return bestWord
+
 loop = "t"
-while (loop == "t"): 
+while (loop == "t"):
     word = input("Enter a 5 letter word: ")
     accuracy = input("How correct was the word? 0 = grey, 1 = yellow, 2 = green: ")
     for i in range (5):
@@ -53,4 +83,7 @@ while (loop == "t"):
         elif (acc == '2'):
             lines = findMatch(char, i, lines)    
     print(lines)
+    print("----Finding best guess----")
+    print (findBestGuess(lines, rankList(lines)))
+
     loop = input("Continue? (t or f): ")

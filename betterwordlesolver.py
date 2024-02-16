@@ -22,8 +22,6 @@ def eliminateLetter(char, words): #if there's a double letter and one is grey, i
             words.pop(x)
     return words
 
-
-
 def eliminateYellow(char, pos, words):
     for x in range(len(words)-1, -1, -1):
         if (not charInWord(char, words[x])):
@@ -32,10 +30,40 @@ def eliminateYellow(char, pos, words):
             words.pop(x)
     return words
 
-
 def findMatch(char, i, words):
     for x in range(len(words)-1, -1, -1):
         if (words[x][i] != char):
+            words.pop(x)
+    return words
+
+def findDupes(word):
+    dupes = []
+    chars = []
+    for c in word:
+        if c in chars and (not c in dupes):
+            dupes.append(c)
+        else:
+            chars.append(c)
+    return dupes
+
+def hasDupe(char, word):
+    count = 0
+    for c in word:
+        if c == char:
+            count += 1
+    return count > 1
+
+def deleteDupes(char, words):
+    for x in range(len(words)-1, -1, -1):
+        if(hasDupe(char, words[x])):
+            words.pop(x)
+    return words
+
+def filterNonDupes(char, pos, words):
+    for x in range(len(words)-1, -1, -1):
+        if (not hasDupe(char, words[x])):
+            words.pop(x)
+        elif (words[x][pos] == char):
             words.pop(x)
     return words
 
@@ -70,13 +98,20 @@ def findBestGuess(words, rankList):
     return bestWord
 
 loop = "t"
+print("----Finding best guess----")
+print (findBestGuess(lines, rankList(lines)))
 while (loop == "t"):
     word = input("Enter a 5 letter word: ")
     accuracy = input("How correct was the word? 0 = grey, 1 = yellow, 2 = green: ")
+    dupes = findDupes(word)
     for i in range (5):
         char = word[i]
         acc = accuracy[i]
-        if (acc == '0'):
+        if (acc == '0' and (char in dupes)):
+            lines = deleteDupes(char, lines)
+        elif (acc == '1' and (char in dupes)):
+            lines = filterNonDupes(char, i, lines)
+        elif (acc == '0'):
             lines = eliminateLetter(char, lines)
         elif (acc == '1'):
             lines = eliminateYellow(char, i, lines)

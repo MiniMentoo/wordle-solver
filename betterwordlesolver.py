@@ -53,9 +53,11 @@ def hasDupe(char, word):
             count += 1
     return count > 1
 
-def deleteDupes(char, words):
+def deleteDupes(char, pos, words):
     for x in range(len(words)-1, -1, -1):
         if(hasDupe(char, words[x])):
+            words.pop(x)
+        elif (words[x][pos] == char):
             words.pop(x)
     return words
 
@@ -108,7 +110,7 @@ while (loop == "t"):
         char = word[i]
         acc = accuracy[i]
         if (acc == '0' and (char in dupes)):
-            lines = deleteDupes(char, lines)
+            lines = deleteDupes(char, i, lines)
         elif (acc == '1' and (char in dupes)):
             lines = filterNonDupes(char, i, lines)
         elif (acc == '0'):

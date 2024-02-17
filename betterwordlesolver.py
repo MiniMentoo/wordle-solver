@@ -103,7 +103,7 @@ print (findBestGuess(lines, rankList(lines)))
 while (loop == "t"):
     word = input("Enter a 5 letter word: ")
     accuracy = input("How correct was the word? 0 = grey, 1 = yellow, 2 = green: ")
-    dupes = findDupes(word)
+    dupes = [] #keeps a record of characters checked so it can track dupes
     for i in range (5):
         char = word[i]
         acc = accuracy[i]
@@ -115,8 +115,10 @@ while (loop == "t"):
             lines = eliminateLetter(char, lines)
         elif (acc == '1'):
             lines = eliminateYellow(char, i, lines)
-        elif (acc == '2'):
-            lines = findMatch(char, i, lines)    
+            dupes.append(char)
+        elif (acc == '2'): #edge case if sanes has acc 00002 (will remove all s first)
+            lines = findMatch(char, i, lines)
+            dupes.append(char)    
     print(lines)
     print("----Finding best guess----")
     print (findBestGuess(lines, rankList(lines)))

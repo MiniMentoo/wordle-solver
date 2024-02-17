@@ -99,10 +99,10 @@ def findBestGuess(words, rankList):
             bestWord = word
     return bestWord
 
-loop = "t"
+loop = True
 print("----Finding best guess----")
 print (findBestGuess(lines, rankList(lines)))
-while (loop == "t"):
+while (loop):
     word = input("Enter a 5 letter word: ")
     accuracy = input("How correct was the word? 0 = grey, 1 = yellow, 2 = green: ")
     dupes = [] #keeps a record of characters checked so it can track dupes
@@ -130,4 +130,6 @@ while (loop == "t"):
     print("----Finding best guess----")
     print (findBestGuess(lines, rankList(lines)))
 
-    loop = input("Continue? (t or f): ")
+    loop = len(lines) > 1
+
+print("Jobs done!")

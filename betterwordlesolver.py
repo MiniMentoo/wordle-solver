@@ -12,6 +12,7 @@ with open(FILENAME, "r") as words:
 for i in range(len(lines)):
     lines[i] = lines[i].rstrip()
 
+words.close()
 
 def rankList(words):
     rankList = [] #stores 5 dictionaries, each keeping track of how many times the letter appeared in that position

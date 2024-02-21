@@ -4,6 +4,7 @@ FILENAME = "words.txt"
 #FILENAME = "answers.txt"
 
 from string import ascii_lowercase
+from analyser import Analyser
 
 with open(FILENAME, "r") as words:
     lines = words.readlines()

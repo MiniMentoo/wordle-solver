@@ -1,5 +1,5 @@
 from string import ascii_lowercase
-from filter import filter_by_guess
+from filter import filter_by_guess, findDupes
 
 class Analyser:
     def __init__(self, answers : list[str], all_guesses : list[str]) -> None:
@@ -9,8 +9,19 @@ class Analyser:
         self.probability_list : list[dict[str, float]] = self.precompute_ranks()
         self.frequency_list : dict[str, float] = self.precompute_frequencies()
     
+    def find_best_guess(self) -> str:
+        bestVal = -1
+        bestWord = None
+        for word in self.all_guesses:
+            val = self.eval_guess(word)
+            if val > bestVal:
+                bestVal = val
+                bestWord = word
+        return bestWord
+    
     def eval_guess(self, guess : str) -> float:
-        pass
+        return self.score_guess(guess) #TODO implement cool info theory stuff later
+    
         #should take a guess and give percentage the guess is good
         #guesses that narrow down the possible answerlist most should rank higher
         #guesses that are guaranteed to be correct should return 100
@@ -53,5 +64,24 @@ class Analyser:
         
         return dictionary
     
-    def prob_char_in_answer(self, char : str) -> float:
-        pass
+    def probability_char_in_answer(self, char : str) -> float:
+        return self.frequency_list[char]
+    
+    def probability_char_goes_green(self, char : str, index : int) -> float:
+        return self.probability_list[index][char]
+    
+    def score_guess(self, guess : str) -> float:
+        dupes = []
+        score = 0
+        #juvenile function, adds probabilities each letter in guess is in word (taking into account dupes)
+        # and adds probabilities the letter goes green aswell
+        for i in range(self.WORDLE_SIZE):
+            char = guess[i]                        
+            score += self.probability_char_goes_green(char, i)
+            prob_yellow = self.probability_char_in_answer(char)
+            if char not in dupes:
+                score += prob_yellow
+                dupes.append(char)
+            elif prob_yellow > 1:
+                score += prob_yellow - 1
+        return score

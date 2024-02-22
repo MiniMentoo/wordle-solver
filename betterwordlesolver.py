@@ -26,11 +26,11 @@ if __name__ == "__main__":
     while (loop):
         word = input("Enter a 5 letter word: ")
         accuracy = input("How correct was the word? 0 = grey, 1 = yellow, 2 = green: ")
-        lines = filter_by_guess(word, accuracy, lines)
-        print(lines)
+        analist.filter(word, accuracy)
+        print(analist.valid_words)
         print("----Finding best guess----")
         print(analist.find_best_guess())
 
-        loop = len(lines) > 1
+        loop = len(analist.valid_words) > 1
 
     print("Jobs done!")

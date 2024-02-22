@@ -4,6 +4,7 @@ from filter import filter_by_guess
 class Analyser:
     def __init__(self, answers : list[str], all_guesses : list[str]) -> None:
         self.valid_words : list[str] = answers.copy()
+        self.valid_guesses : list [str] = all_guesses.copy()
         self.all_guesses : list[str] = all_guesses.copy()
         self.WORDLE_SIZE : int = 5
         self.probability_list : list[dict[str, float]] = self.precompute_ranks()
@@ -26,7 +27,19 @@ class Analyser:
         #guesses that narrow down the possible answerlist most should rank higher
         #guesses that are guaranteed to be correct should return 100
         #guesses that only gain one letter eg (c)atch (m)atch (w)atch should rank lower than
-            #a guess which searches all these letters 
+            #a guess which searches all these letters
+    
+    def filter(self, guess : str, accuracy : str) -> None:
+        self.valid_words = filter_by_guess(guess, accuracy, self.valid_words)
+        self.valid_guesses = filter_by_guess(guess, accuracy, self.valid_guesses)
+        
+        #if the wordle of the day isn't in our answerlist, answerlist will become empty as we filter down
+        # so make the entire remaining guesslist left our possible answerlist (should be very similar)
+        if not self.valid_words:
+            self.valid_words = self.valid_guesses
+            
+        self.frequency_list = self.precompute_frequencies()
+        self.probability_list = self.precompute_ranks()
     
     def precompute_ranks(self) -> list[dict[str, float]]:
         rankList : list[dict[str, float]] = [] #stores 5 dictionaries, each keeping track of the probability of the letter being in that position

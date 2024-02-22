@@ -1,5 +1,5 @@
 from string import ascii_lowercase
-from filter import filter_by_guess, findDupes
+from filter import filter_by_guess
 
 class Analyser:
     def __init__(self, answers : list[str], all_guesses : list[str]) -> None:

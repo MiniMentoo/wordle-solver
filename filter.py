@@ -1,4 +1,5 @@
-def filter_by_guess(guess : str, accuracy : str, words : list[str]) -> list[str]:
+def filter_by_guess(guess : str, accuracy : str, word_list : list[str]) -> list[str]:
+    words = word_list.copy()
     dupes = [] #keeps a record of characters checked so it can track dupes
     remove = []
     for i in range (5):

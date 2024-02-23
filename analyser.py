@@ -18,6 +18,7 @@ class Analyser:
             if val > bestVal:
                 bestVal = val
                 bestWord = word
+        print(bestVal)
         return bestWord
     
     def eval_guess(self, guess : str) -> float:
@@ -93,8 +94,10 @@ class Analyser:
             score += self.probability_char_goes_green(char, i)
             prob_yellow = self.probability_char_in_answer(char)
             if char not in dupes:
-                score += prob_yellow
+                # need to make sure no probability added exceeds 1, and cus of duplicates prob_yellow can do so
+                score += min(prob_yellow, 1)
                 dupes.append(char)
             elif prob_yellow > 1:
-                score += prob_yellow - 1
+                # adding min here because otherwise the solver is biased for triplets
+                score += min(prob_yellow - 1, 1)
         return score

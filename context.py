@@ -12,10 +12,17 @@ class Context:
             self.possibile_chars.append(chars.copy())
     
     def process_grey(self, char : str) -> None:
-        pass
+        for i in range(self.WORDLE_SIZE):
+            self.possibile_chars[i][char] = False
     
     def process_green(self, char: str, position : int) -> None:
-        pass
+        for c in ascii_lowercase:
+            if c != char:
+                self.possibile_chars[position][c] = False
+            else:
+                self.possibile_chars[position][c] = True
     
     def process_yellow(self, char : str, position : int) -> None:
-        pass
+        if not char in self.chars_in_word:
+            self.chars_in_word.append(char)
+        self.possibile_chars[position][char] = False

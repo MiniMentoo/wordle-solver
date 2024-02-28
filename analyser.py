@@ -6,7 +6,9 @@ class Analyser:
         self.valid_words : list[str] = answers.copy()
         self.valid_guesses : list [str] = all_guesses.copy()
         self.all_guesses : list[str] = all_guesses.copy()
+        self.greys : list[str] = []
         self.WORDLE_SIZE : int = 5
+        self.guessCount : int = 0
         self.probability_list : list[dict[str, float]] = self.precompute_ranks()
         self.frequency_list : dict[str, float] = self.precompute_frequencies()
     
@@ -22,8 +24,8 @@ class Analyser:
         return bestWord
     
     def eval_guess(self, guess : str) -> float:
-        return self.score_guess(guess) #TODO implement cool info theory stuff later
-    
+        score = self.score_guess(guess) #TODO implement cool info theory stuff later
+        return score
         #should take a guess and give percentage the guess is good
         #guesses that narrow down the possible answerlist most should rank higher
         #guesses that are guaranteed to be correct should return 100
@@ -34,6 +36,10 @@ class Analyser:
         self.valid_words = filter_by_guess(guess, accuracy, self.valid_words)
         self.valid_guesses = filter_by_guess(guess, accuracy, self.valid_guesses)
         
+        for acc, char in zip(accuracy, guess):
+            if acc == "0":
+                self.greys.append(char)
+        
         #if the wordle of the day isn't in our answerlist, answerlist will become empty as we filter down
         # so make the entire remaining guesslist left our possible answerlist (should be very similar)
         if not self.valid_words:
@@ -41,6 +47,7 @@ class Analyser:
             
         self.frequency_list = self.precompute_frequencies()
         self.probability_list = self.precompute_ranks()
+        self.guessCount+=1
     
     def precompute_ranks(self) -> list[dict[str, float]]:
         rankList : list[dict[str, float]] = [] #stores 5 dictionaries, each keeping track of the probability of the letter being in that position
@@ -89,6 +96,8 @@ class Analyser:
         score = 0
         #juvenile function, adds probabilities each letter in guess is in word (taking into account dupes)
         # and adds probabilities the letter goes green aswell
+        # min is 0 (the guess is so shit none of the letters could possibly be in the answer)
+        # max is 10 (it is certain this is the only possible answer left)
         for i in range(self.WORDLE_SIZE):
             char = guess[i]                        
             score += self.probability_char_goes_green(char, i)

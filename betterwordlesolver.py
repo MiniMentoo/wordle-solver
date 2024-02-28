@@ -1,60 +1,36 @@
 WORDLE_SIZE = 5
-#comment whichever one you're not using, I recommend using the full words.txt since answers.txt is outdated and might miss answers
-FILENAME = "words.txt"
-#FILENAME = "answers.txt"
+GUESSLIST = "words.txt"
+ANSWERLIST = "answers.txt" #this is an outdated answerlist but it'll do
 
 from string import ascii_lowercase
 from analyser import Analyser
 from filter import filter_by_guess
 
-with open(FILENAME, "r") as words:
+with open(GUESSLIST, "r") as words:
     lines = words.readlines()
 for i in range(len(lines)):
     lines[i] = lines[i].rstrip()
-
+words.close()
+with open(ANSWERLIST, "r") as words:
+    valid_words = words.readlines()
+for i in range(len(valid_words)):
+    valid_words[i] = valid_words[i].rstrip()
 words.close()
 
-def rankList(words):
-    rankList = [] #stores 5 dictionaries, each keeping track of how many times the letter appeared in that position
-    for i in range (WORDLE_SIZE):
-        dict = {}
-        for c in ascii_lowercase:
-            dict.update({c : 0})
-        rankList.append(dict)
-    
-    for x in range(len(words)-1, -1, -1):
-        for i in  range(WORDLE_SIZE):
-            c = words[x][i]
-            rankList[i][c] = rankList[i][c] + 1    
-    return rankList
 
-def computeValue(word, rankList):
-    value = 0
-    for i in range(WORDLE_SIZE):
-        value += rankList[i][word[i]]
-    return value
-
-def findBestGuess(words, rankList):
-    bestVal = -1
-    bestWord = None
-    for word in words:
-        val = computeValue(word, rankList)
-        if val > bestVal:
-            bestVal = val
-            bestWord = word
-    return bestWord
-
-loop = True
-print("----Finding best guess----")
-print (findBestGuess(lines, rankList(lines)))
-while (loop):
-    word = input("Enter a 5 letter word: ")
-    accuracy = input("How correct was the word? 0 = grey, 1 = yellow, 2 = green: ")
-    lines = filter_by_guess(word, accuracy, lines)
-    print(lines)
+if __name__ == "__main__":
+    analist = Analyser(valid_words, lines)
+    loop = True
     print("----Finding best guess----")
-    print (findBestGuess(lines, rankList(lines)))
+    print (analist.find_best_guess())
+    while (loop):
+        word = input("Enter a 5 letter word: ")
+        accuracy = input("How correct was the word? 0 = grey, 1 = yellow, 2 = green: ")
+        analist.filter(word, accuracy)
+        print(analist.valid_words)
+        print("----Finding best guess----")
+        print(analist.find_best_guess())
 
-    loop = len(lines) > 1
+        loop = len(analist.valid_words) > 1
 
-print("Jobs done!")
+    print("Jobs done!")

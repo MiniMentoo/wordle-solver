@@ -1,4 +1,5 @@
-def filter_by_guess(guess : str, accuracy : str, words : list[str]) -> list[str]:
+def filter_by_guess(guess : str, accuracy : str, word_list : list[str]) -> list[str]:
+    words = word_list.copy()
     dupes = [] #keeps a record of characters checked so it can track dupes
     remove = []
     for i in range (5):
@@ -21,7 +22,7 @@ def filter_by_guess(guess : str, accuracy : str, words : list[str]) -> list[str]
         if (not char in dupes):
             words = eliminateLetter(char, words)
     return words
-            
+
 def charInWord(char, word):
     for c in word:
         if(char == c):
@@ -47,16 +48,6 @@ def findMatch(char, i, words):
         if (words[x][i] != char):
             words.pop(x)
     return words
-
-def findDupes(word):
-    dupes = []
-    chars = []
-    for c in word:
-        if c in chars and (not c in dupes):
-            dupes.append(c)
-        else:
-            chars.append(c)
-    return dupes
 
 def hasDupe(char, word):
     count = 0

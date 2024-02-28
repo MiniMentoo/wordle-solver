@@ -18,7 +18,7 @@ class Analyser:
         bestWord = None
         length = len(self.valid_words)
         for word in self.all_guesses:
-            val = self.score_guess(word)
+            val = self.eval_guess(word, length)
             if val > bestVal:
                 bestVal = val
                 bestWord = word
@@ -28,25 +28,18 @@ class Analyser:
     def eval_guess(self, guess : str, length_original : int) -> float:
         dividing_factor = 0
         dupes = []
-        for i in range(self.WORDLE_SIZE):
+        for i in range(self.WORDLE_SIZE): #function bugged, not finding the answer when it's narrowed it down to 1, produces random guess
             char = guess[i]
             if char in dupes:
                 isDupe = True
             else:
                 isDupe = False
                 dupes.append(char)
-            fraction = len_filter_by_char(char, "0", i, isDupe, self.valid_words) / length_original            
-            prob_yellow = self.probability_char_in_answer(char)
-            if isDupe:
-                # need to make sure no probability added exceeds 1, and cus of duplicates prob_yellow can do so
-                prob_yellow = min(prob_yellow, 1)
-            elif prob_yellow > 1:
-                # adding min here because otherwise the solver is biased for triplets
-                prob_yellow = min(prob_yellow - 1, 1)
-            dividing_factor += prob_yellow * fraction
-            fraction = len_filter_by_char(char, "2", i, isDupe, self.valid_words) / length_original
-            dividing_factor += (1- self.probability_char_goes_green(char, i)) * fraction
-        return 10 - dividing_factor
+            fraction = 1 - len_filter_by_char(char, "0", i, isDupe, self.valid_words, length_original)       
+            dividing_factor += (1 - self.probability_char_in_answer(char, isDupe)) * fraction
+            fraction = 1 - len_filter_by_char(char, "2", i, isDupe, self.valid_words, length_original)
+            dividing_factor += self.probability_char_goes_green(char, i) * fraction
+        return dividing_factor
         #should take a guess and give percentage the guess is good
         #guesses that narrow down the possible answerlist most should rank higher
         #guesses that are guaranteed to be correct should return 100

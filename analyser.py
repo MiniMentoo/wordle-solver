@@ -1,5 +1,6 @@
 from string import ascii_lowercase
-from filter import filter_by_guess
+from filter import filter_by_guess, len_filter_by_char
+from itertools import product
 
 class Analyser:
     def __init__(self, answers : list[str], all_guesses : list[str]) -> None:
@@ -15,17 +16,37 @@ class Analyser:
     def find_best_guess(self) -> str:
         bestVal = -1
         bestWord = None
+        length = len(self.valid_words)
         for word in self.all_guesses:
-            val = self.eval_guess(word)
+            val = self.score_guess(word)
             if val > bestVal:
                 bestVal = val
                 bestWord = word
         print(bestVal)
         return bestWord
     
-    def eval_guess(self, guess : str) -> float:
-        score = self.score_guess(guess) #TODO implement cool info theory stuff later
-        return score
+    def eval_guess(self, guess : str, length_original : int) -> float:
+        dividing_factor = 0
+        dupes = []
+        for i in range(self.WORDLE_SIZE):
+            char = guess[i]
+            if char in dupes:
+                isDupe = True
+            else:
+                isDupe = False
+                dupes.append(char)
+            fraction = len_filter_by_char(char, "0", i, isDupe, self.valid_words) / length_original            
+            prob_yellow = self.probability_char_in_answer(char)
+            if isDupe:
+                # need to make sure no probability added exceeds 1, and cus of duplicates prob_yellow can do so
+                prob_yellow = min(prob_yellow, 1)
+            elif prob_yellow > 1:
+                # adding min here because otherwise the solver is biased for triplets
+                prob_yellow = min(prob_yellow - 1, 1)
+            dividing_factor += prob_yellow * fraction
+            fraction = len_filter_by_char(char, "2", i, isDupe, self.valid_words) / length_original
+            dividing_factor += (1- self.probability_char_goes_green(char, i)) * fraction
+        return 10 - dividing_factor
         #should take a guess and give percentage the guess is good
         #guesses that narrow down the possible answerlist most should rank higher
         #guesses that are guaranteed to be correct should return 100
@@ -85,8 +106,17 @@ class Analyser:
         
         return dictionary
     
-    def probability_char_in_answer(self, char : str) -> float:
-        return self.frequency_list[char]
+    def probability_char_in_answer(self, char : str, is_dupe : bool) -> float:
+        prob_yellow = self.frequency_list[char]
+        if not is_dupe:
+            # need to make sure no probability added exceeds 1, and cus of duplicates prob_yellow can do so
+            prob_yellow = min(prob_yellow, 1)
+        elif prob_yellow > 1:
+            # adding min here because otherwise the solver is biased for triplets
+            prob_yellow = min(prob_yellow - 1, 1)
+        else:
+            prob_yellow = 0
+        return prob_yellow
     
     def probability_char_goes_green(self, char : str, index : int) -> float:
         return self.probability_list[index][char]
@@ -101,12 +131,6 @@ class Analyser:
         for i in range(self.WORDLE_SIZE):
             char = guess[i]                        
             score += self.probability_char_goes_green(char, i)
-            prob_yellow = self.probability_char_in_answer(char)
-            if char not in dupes:
-                # need to make sure no probability added exceeds 1, and cus of duplicates prob_yellow can do so
-                score += min(prob_yellow, 1)
-                dupes.append(char)
-            elif prob_yellow > 1:
-                # adding min here because otherwise the solver is biased for triplets
-                score += min(prob_yellow - 1, 1)
+            score += self.probability_char_in_answer(char, char in dupes)
+            dupes.append(char)
         return score

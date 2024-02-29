@@ -36,6 +36,10 @@ def len_filter_by_char(guess_char : str, accuracy_char : str, position : int, is
     length = len(words)
     if length == 0:
         return 1
+    if length == 1: #if this filter will get us to 1 possible guess, it's the best it can be
+        #if this isn't set to 0 then near the end it'll be 1/3 due to the small size of the possible answerlist
+        #so I'm setting it to 0 to encourage guesses that reduce down to 1 possible answer specifically
+        return 0
     return length / length_original
 
 def charInWord(char, word):

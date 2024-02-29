@@ -21,6 +21,8 @@ def filter_by_guess(guess : str, accuracy : str, word_list : list[str]) -> list[
         char = remove.pop()
         if (not char in dupes):
             words = eliminateLetter(char, words)
+        else:
+            words = deleteDupes(char, -1, words)
     return words
 
 def len_filter_by_char(guess_char : str, accuracy_char : str, position : int, is_dupe : bool, word_list : list[str], length_original : int) -> int:
@@ -73,7 +75,7 @@ def deleteDupes(char, pos, words):
     for x in range(len(words)-1, -1, -1):
         if(hasDupe(char, words[x])):
             words.pop(x)
-        elif (words[x][pos] == char):
+        elif (pos >= 0 and words[x][pos] == char):
             words.pop(x)
     return words
 

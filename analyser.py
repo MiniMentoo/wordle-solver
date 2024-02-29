@@ -26,20 +26,8 @@ class Analyser:
         return bestWord
     
     def eval_guess(self, guess : str, length_original : int) -> float:
-        dividing_factor = 0
-        dupes = []
-        for i in range(self.WORDLE_SIZE): #function bugged, not finding the answer when it's narrowed it down to 1, produces random guess
-            char = guess[i]
-            if char in dupes:
-                isDupe = True
-            else:
-                isDupe = False
-                dupes.append(char)
-            fraction = 1 - len_filter_by_char(char, "0", i, isDupe, self.valid_words, length_original)       
-            dividing_factor += (1 - self.probability_char_in_answer(char, isDupe)) * fraction
-            fraction = 1 - len_filter_by_char(char, "2", i, isDupe, self.valid_words, length_original)
-            dividing_factor += self.probability_char_goes_green(char, i) * fraction
-        return dividing_factor
+        
+        return self.score_info_gained(guess, length_original)
         #should take a guess and give percentage the guess is good
         #guesses that narrow down the possible answerlist most should rank higher
         #guesses that are guaranteed to be correct should return 100
@@ -127,3 +115,19 @@ class Analyser:
             score += self.probability_char_in_answer(char, char in dupes)
             dupes.append(char)
         return score
+    
+    def score_info_gained(self, guess : str, length_original : int) -> float:
+        dividing_factor = 0
+        dupes = []
+        for i in range(self.WORDLE_SIZE): #function bugged, not finding the answer when it's narrowed it down to 1, produces random guess
+            char = guess[i]
+            if char in dupes:
+                isDupe = True
+            else:
+                isDupe = False
+                dupes.append(char)
+            fraction1 = 1 - len_filter_by_char(char, "0", i, isDupe, self.valid_words, length_original)       
+            dividing_factor += (1 - self.probability_char_in_answer(char, isDupe)) * fraction1
+            fraction = 1 - len_filter_by_char(char, "2", i, isDupe, self.valid_words, length_original)
+            dividing_factor += self.probability_char_goes_green(char, i) * fraction
+        return dividing_factor

@@ -33,7 +33,7 @@ def len_filter_by_char(guess_char : str, accuracy_char : str, position : int, is
         words = findMatch(guess_char, position, words)
     length = len(words)
     if length == 0:
-        return 0
+        return 1
     return length / length_original
 
 def charInWord(char, word):

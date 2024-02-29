@@ -22,14 +22,17 @@ if __name__ == "__main__":
     analist = Analyser(valid_words, lines)
     loop = True
     print("----Finding best guess----")
-    print (analist.find_best_guess())
+    #(word, score) = (analist.find_best_guess())
+    #print(f"{word} with score {score}")
+    print ("soare from prcomputation") #this is the precomputed best guess, uncomment the first two lines if you want to verify, will take a minute to run
     while (loop):
         word = input("Enter a 5 letter word: ")
         accuracy = input("How correct was the word? 0 = grey, 1 = yellow, 2 = green: ")
         analist.filter(word, accuracy)
         print(analist.valid_words)
         print("----Finding best guess----")
-        print(analist.find_best_guess())
+        (word, score) = analist.find_best_guess()
+        print(f"{word} with score {score}")
 
         loop = len(analist.valid_words) > 1
 

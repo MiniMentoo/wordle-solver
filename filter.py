@@ -9,6 +9,8 @@ def filter_by_guess(guess : str, accuracy : str, word_list : list[str]) -> list[
             words = deleteDupes(char, i, words) #doesn't work if the word has 3 of the same letter (idk why you'd ever guess that)
         elif (acc == '1' and (char in dupes)):
             words = filterNonDupes(char, i, words)
+        elif (acc == '2' and (char in dupes)): #for the edge case where a double letter is guessed and it goes yellow then green
+            words = filterNonGreenDupes(char, i, words)
         elif (acc == '0'):
             remove.append(char)
         elif (acc == '1'):
@@ -88,5 +90,13 @@ def filterNonDupes(char, pos, words):
         if (not hasDupe(char, words[x])):
             words.pop(x)
         elif (words[x][pos] == char):
+            words.pop(x)
+    return words
+
+def filterNonGreenDupes(char, pos, words):
+    for x in range(len(words)-1, -1, -1):
+        if (not hasDupe(char, words[x])):
+            words.pop(x)
+        elif (words[x][pos] != char):
             words.pop(x)
     return words
